@@ -1,74 +1,101 @@
 "use strict";
 
-/** Express app for webspace dashboard. */
+// Create express app
+let express = require("express");
+let app = express();
+let db = require("./db.js")
 
-const jsonschema = require("jsonschema");
-const express = require("express");
 
-const createData = require("./seed");
-const makeFunctions = require("./utils");
-const db = require("./db");
-const Search = require("./models")
-
-const app = express();
-// const infoRoutes = require("./routes/info");
-// app.use("/info", infoRoutes);
-
-const port = 3000;
-
-app.use(express.urlencoded());
-app.use(express.json());
-
-const insertX = async () => {
-    for (let i = 0; i < createData.length; i++) {
-        try {
-            let returnedTables = await makeFunctions[i](i);
-            console.log(returnedTables);
-            await new Promise((resolve, reject) => {
-                db.run(createData[i][1], (err) => {
-                    if (err) {
-                        console.error(`Error running query for index ${i}:`, err.message);
-                        reject(err);
-                    } else {
-                        console.log(`Query for index ${i} executed successfully`);
-                        resolve();
-                    }
-                });
-            });
-        } catch (err) {
-            // Handle any errors that occurred during table creation or query execution
-            console.error(`Error in iteration ${i}:`, err);
-        }
-    }
-};
-
-const initializeDatabase = async () => {
-    try {
-        await insertX();
-        console.log("Database initialization completed successfully");
-    } catch (err) {
-        console.error("Error during database initialization:", err);
-        // Handle the error as appropriate for your application
-    }
-};
-
-// Initialize the database before starting the server
-initializeDatabase().then(() => {
-    // Start the Express app
-    app.listen(port, () => {
-        console.log(`Server is listening on port ${port}`);
-    });
+// Root endpoint
+app.get("/", (req, res, next) => {
+    res.json({"message":"Ok"})
 });
 
-app.get("/", async function (req, res, next) {
+// Insert other API endpoints here
 
-    let table = req.query.table;
-    let key = req.query.key;
-    let vals = await Search.find(table);
+//TODO: Shows everything in customers, but for servers_used and applications only shows first one.
+//Not sure about other tables.
 
-    return res.json(vals);
-    // return res.json({ table: req.query.table, key: req.query.key });
+app.get("/api/:table/:name/:info", (req, res, next) => {
+    let tableVar = req.params.table;
+    let infoVar = req.params.info;
+    let nameVar;
+    if (tableVar === "customers" ||
+        tableVar === "server_types" ||
+        tableVar === "resource_types" ||
+        tableVar === "code_languages" ||
+        tableVar === "software_technologies" ||
+        tableVar === "applications"){
+        nameVar = "name";
+    }
+    else{
+        nameVar = "id";
+
+    }
+    let sql = `SELECT ${infoVar} FROM ${tableVar} WHERE ${nameVar} = ?`
+    let params = [req.params.name]
+    db.get(sql, params, (err, row) => {
+        if (err) {
+          res.status(400).json({"error":err.message});
+          return;
+        }
+        res.json({
+            "message":"success",
+            "data":row
+        })
+      });
+});
+
+
+app.get("/api/:table/:name", (req, res, next) => {
+    let tableVar = req.params.table;
+    let nameVar;
+    if (tableVar === "customers" ||
+        tableVar === "server_types" ||
+        tableVar === "resource_types" ||
+        tableVar === "code_languages" ||
+        tableVar === "software_technologies" ||
+        tableVar === "applications"){
+        nameVar = "name";
+    }
+    else{
+        nameVar = "id";
+
+    }
+    let sql = `SELECT * FROM ${tableVar} WHERE ${nameVar} = ?`
+    let params = [req.params.name]
+    db.get(sql, params, (err, row) => {
+        if (err) {
+          res.status(400).json({"error":err.message});
+          return;
+        }
+        res.json({
+            "message":"success",
+            "data":row
+        })
+      });
+});
+
+app.get("/api/:table", (req, res, next) => {
+    let tableVar = req.params.table;
+    let sql = `SELECT * FROM ${tableVar}`
+    let params = []
+    db.get(sql, params, (err, row) => {
+        if (err) {
+          res.status(400).json({"error":err.message});
+          return;
+        }
+        res.json({
+            "message":"success",
+            "data":row
+        })
+      });
+});
+
+
+// Default response for any other request
+app.use(function(req, res){
+    res.status(404);
 });
 
 module.exports = app;
-
