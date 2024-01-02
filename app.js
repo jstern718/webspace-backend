@@ -4,25 +4,31 @@
 let express = require("express");
 let app = express();
 let db = require("./db.js")
+const cors = require('cors');
 
+
+app.use(cors());
 
 // Root endpoint
 app.get("/", (req, res, next) => {
+    console.log("-----");
+    console.log("run route: '/'");
+
     res.json({"message":"Ok"})
 });
 
 // Insert other API endpoints here
 
-//TODO: Shows everything in customers, but for servers_used and applications only shows first one.
-//Not sure about other tables.
-
 app.get("/api/:table", (req, res, next) => {
+    console.log("-----");
+    console.log("run route: '/api/:table'")
     let tableVar = req.params.table;
     let sql = `SELECT * FROM ${tableVar}`;
     let params = [];
     db.all(sql, params, (err, row) => {
-        console.log("table get");
+        console.log("db.all runs:", "sql =", sql);
         if (err) {
+          console.log("sql error at line 24");
           res.status(400).json({"error":err.message});
           return;
         }
@@ -33,47 +39,33 @@ app.get("/api/:table", (req, res, next) => {
       });
 });
 
-
 app.all("/api/:table/:name", (req, res, next) => {
+    console.log("-----");
+    console.log("run route: '/api/:table/:name'")
+
     let tableVar = req.params.table;
     let nameVar = req.params.name || null;
-    let infoVar = req.params.info || null;
-    let whereInsert;
+    let whereInsert = "name";
 
-    if (tableVar === "customers" ||
-        tableVar === "server_types" ||
-        tableVar === "resource_types" ||
-        tableVar === "code_languages" ||
-        tableVar === "software_technologies" ||
-        tableVar === "applications"){
-        whereInsert = "name";
-    }
-    else{
-        whereInsert = "id";
-    }
-
-    let x = "*";
-    // if (infoVar !== null){
-    //     x = infoVar;
-    // };
-
-    // let sql;
-    let sql = `SELECT * FROM ${tableVar} WHERE ${whereInsert} = ?`;
-
-    // if (!infoVar){
-    //     let sql = `SELECT * FROM ${tableVar} WHERE ${whereInsert} = ?`;
+    // if (tableVar === "customers" ||
+    //     tableVar === "server_types" ||
+    //     tableVar === "resource_types" ||
+    //     tableVar === "code_languages" ||
+    //     tableVar === "software_technologies" ||
+    //     tableVar === "applications"){
+    //     whereInsert = "name";
     // }
     // else{
-    //     console.log("infoVar:", infoVar);
-    //     sql = `SELECT ${infoVar} FROM ${tableVar} WHERE ${whereInsert} = ${nameVar}`
+    //     whereInsert = "name";
     // }
-    console.log("sql", sql);
 
+    let sql = `SELECT * FROM ${tableVar} WHERE ${whereInsert} = ?`;
+    let params = [nameVar];
 
-    let params = [nameVar]
-    db.get(sql, params, (err, row) => {
-        console.log("correct", "sql", sql, "params", params);
+    db.all(sql, params, (err, row) => {
+        console.log("db.get runs:", "sql =", sql, "params =", params);
         if (err) {
+          console.log("sql error at line 76");
           res.status(400).json({"error":err.message});
           return;
         }
@@ -85,43 +77,34 @@ app.all("/api/:table/:name", (req, res, next) => {
 });
 
 app.all("/api/:table/:name/:info", (req, res, next) => {
+    console.log("-----");
+    console.log("run route: '/api/:table/:name/:info'");
+
     let tableVar = req.params.table;
     let nameVar = req.params.name || null;
     let infoVar = req.params.info || null;
-    let whereInsert;
+    let whereInsert = "name";
 
-    if (tableVar === "customers" ||
-        tableVar === "server_types" ||
-        tableVar === "resource_types" ||
-        tableVar === "code_languages" ||
-        tableVar === "software_technologies" ||
-        tableVar === "applications"){
-        whereInsert = "name";
-    }
-    else{
-        whereInsert = "id";
-    }
-
-        let  x = infoVar;
-
-
-    // let sql;
-    let sql = `SELECT ${x} FROM ${tableVar} WHERE ${whereInsert} = ?`;
-
-    // if (!infoVar){
-    //     let sql = `SELECT * FROM ${tableVar} WHERE ${whereInsert} = ?`;
+    // if (tableVar === "customers" ||
+    //     tableVar === "server_types" ||
+    //     tableVar === "resource_types" ||
+    //     tableVar === "code_languages" ||
+    //     tableVar === "software_technologies" ||
+    //     tableVar === "applications"){
+    //     whereInsert = "name";
     // }
     // else{
-    //     console.log("infoVar:", infoVar);
-    //     sql = `SELECT ${infoVar} FROM ${tableVar} WHERE ${whereInsert} = ${nameVar}`
+    //     whereInsert = "name";
     // }
-    console.log("sql", sql);
 
+    let sql = `SELECT ${infoVar} FROM ${tableVar} WHERE ${whereInsert} = ?`;
+    let params = [nameVar];
 
-    let params = [nameVar]
     db.get(sql, params, (err, row) => {
-        console.log("correct", "sql", sql, "params", params);
+        console.log("-----");
+        console.log("db.get runs:", "sql =", sql, "params =", params);
         if (err) {
+          console.log("sql error at line 126");
           res.status(400).json({"error":err.message});
           return;
         }
@@ -131,39 +114,6 @@ app.all("/api/:table/:name/:info", (req, res, next) => {
         })
       });
 });
-
-
-// app.get("/api/:table/:name", (req, res, next) => {
-//     let tableVar = req.params.table;
-//     let nameVar;
-//     if (tableVar === "customers" ||
-//         tableVar === "server_types" ||
-//         tableVar === "resource_types" ||
-//         tableVar === "code_languages" ||
-//         tableVar === "software_technologies" ||
-//         tableVar === "applications"){
-//         nameVar = "name";
-//     }
-//     else{
-//         nameVar = "id";
-
-//     }
-//     let sql = `SELECT * FROM ${tableVar} WHERE ${nameVar} = ?`
-//     let params = [req.params.name]
-//     db.get(sql, params, (err, row) => {
-//         if (err) {
-//           res.status(400).json({"error":err.message});
-//           return;
-//         }
-//         res.json({
-//             "message":"success",
-//             "data":row
-//         })
-//       });
-// });
-
-
-
 
 // Default response for any other request
 app.use(function(req, res){

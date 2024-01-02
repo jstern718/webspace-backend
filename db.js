@@ -164,24 +164,24 @@ const db = new sqlite3.Database('webspace', (err) => {
             `CREATE TABLE servers_used (
                 id INTEGER PRIMARY KEY,
                 server_name TEXT REFERENCES server_types,
-                customer_name TEXT REFERENCES customers)`,
+                name TEXT REFERENCES customers)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert6 = `INSERT INTO servers_used (
                                     server_name,
-                                    customer_name)
+                                    name)
                                     VALUES (?,?)`;
-                db.run(insert6, ["Apache_Tomcat", "Adam_Apple"]);
-                db.run(insert6, ["IIS", "Bob_Baker"]);
-                db.run(insert6, ["Nginx", "Carl_Cake"]);
+                db.run(insert6, ["Apache_Tomcat", "adamapple"]);
+                db.run(insert6, ["IIS", "bobbaker"]);
+                db.run(insert6, ["Nginx", "carlcake"]);
             }
         });
         db.run(
             `CREATE TABLE resources_used (
                 id INTEGER PRIMARY KEY,
-                customer_name TEXT REFERENCES customers,
+                name TEXT REFERENCES customers,
                 resource_name TEXT REFERENCES resource_types,
                 resource_amount Integer)`,
         (err) => {
@@ -189,45 +189,45 @@ const db = new sqlite3.Database('webspace', (err) => {
                 // Table already created
             }else{
                 let insert7 = `INSERT INTO resources_used (
-                                    customer_name,
+                                    name,
                                     resource_name,
                                     resource_amount)
                                     VALUES (?,?,?)`;
-                db.run(insert7, ["Adam Apple", "Number_of_Servers", 1]);
-                db.run(insert7, ["Adam Apple", "Memory_Usage", 100]);
-                db.run(insert7, ["Adam Apple", "Storage_Usage", 100]);
-                db.run(insert7, ["Adam Apple", "vCPUs", 1]);
-                db.run(insert7, ["Adam Apple", "Clustered_Servers", 0]);
-                db.run(insert7, ["Bob Baker", "Number_of_Servers", 2]);
-                db.run(insert7, ["Bob Baker", "Memory_Usage", 200]);
-                db.run(insert7, ["Bob Baker", "Storage_Usage", 200]);
-                db.run(insert7, ["Bob Baker", "vCPUs", 2]);
-                db.run(insert7, ["Bob Baker", "Clustered_Servers", 1]);
-                db.run(insert7, ["Carl Cake", "Number_of_Servers", 3]);
-                db.run(insert7, ["Carl Cake", "Memory_Usage", 300]);
-                db.run(insert7, ["Carl Cake", "Storage_Usage", 300]);
-                db.run(insert7, ["Carl Cake", "vCPUs", 3]);
-                db.run(insert7, ["Carl Cake", "Clustered_Servers", 1]);
+                db.run(insert7, ["adamapple", "Number_of_Servers", 1]);
+                db.run(insert7, ["adamapple", "Memory_Usage", 100]);
+                db.run(insert7, ["adamapple", "Storage_Usage", 100]);
+                db.run(insert7, ["adamapple", "vCPUs", 1]);
+                db.run(insert7, ["adamapple", "Clustered_Servers", 0]);
+                db.run(insert7, ["bobbaker", "Number_of_Servers", 2]);
+                db.run(insert7, ["bobbaker", "Memory_Usage", 200]);
+                db.run(insert7, ["bobbaker", "Storage_Usage", 200]);
+                db.run(insert7, ["bobbaker", "vCPUs", 2]);
+                db.run(insert7, ["bobbaker", "Clustered_Servers", 1]);
+                db.run(insert7, ["carlcake", "Number_of_Servers", 3]);
+                db.run(insert7, ["carlcake", "Memory_Usage", 300]);
+                db.run(insert7, ["carlcake", "Storage_Usage", 300]);
+                db.run(insert7, ["carlcake", "vCPUs", 3]);
+                db.run(insert7, ["carlcake", "Clustered_Servers", 1]);
             }
         });
         db.run(
             `CREATE TABLE technologies_used (
                 id INTEGER PRIMARY KEY,
-                customer_name TEXT REFERENCES customers,
+                name TEXT REFERENCES customers,
                 technology_name TEXT REFERENCES software_technologies)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert8 = `INSERT INTO technologies_used (
-                                    customer_name,
+                                    name,
                                     technology_name)
                                     VALUES (?,?)`;
-                db.run(insert8, ["Adam_Apple", "Docker"]);
-                db.run(insert8, ["Adam_Apple", "Elasticsearch"]);
-                db.run(insert8, ["Bob_Baker", "Apache_Kafka"]);
-                db.run(insert8, ["Bob_Baker", "Redis"]);
-                db.run(insert8, ["Carl_Cake", "AI"]);
+                db.run(insert8, ["adamapple", "Docker"]);
+                db.run(insert8, ["adamapple", "Elasticsearch"]);
+                db.run(insert8, ["bobbaker", "Apache_Kafka"]);
+                db.run(insert8, ["bobbaker", "Redis"]);
+                db.run(insert8, ["carlcake", "AI"]);
             }
         });
 
@@ -237,7 +237,7 @@ const db = new sqlite3.Database('webspace', (err) => {
                 version_num TEXT,
                 application_url TEXT,
                 application_port TEXT,
-                customer_name TEXT REFERENCES customers)`,
+                name TEXT REFERENCES customers)`,
         (err) => {
             if (err) {
                 // Table already created
@@ -247,20 +247,20 @@ const db = new sqlite3.Database('webspace', (err) => {
                                     version_num,
                                     application_url,
                                     application_port,
-                                    customer_name)
+                                    name)
                                     VALUES (?,?,?,?,?)`;
                 db.run(insert9, ["appa", "1",
                                  "https://appa.com",
                                  "3000",
-                                 "Adam_Apple"]);
+                                 "adamapple"]);
                 db.run(insert9, ["appb", "2",
                                  "https://appb.com",
                                  "3000",
-                                 "Bob_Baker"]);
+                                 "bobbaker"]);
                 db.run(insert9, ["appc", "3",
                                  "https://appc.com",
                                  "3000",
-                                 "Carl_Cake"]);
+                                 "carlcake"]);
             }
         });
         db.run(
