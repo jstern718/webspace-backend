@@ -88,14 +88,14 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE server_types (
-                name TEXT PRIMARY KEY,
+                server_name TEXT PRIMARY KEY,
                 server_price INTEGER)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert2 = `INSERT INTO server_types (
-                                    name,
+                                    server_name,
                                     server_price)
                                     VALUES (?, ?)`;
                 db.run(insert2, ["Apache_Tomcat", 1100]);
@@ -106,14 +106,14 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE resource_types (
-                name TEXT PRIMARY KEY,
+                resource_name TEXT PRIMARY KEY,
                 resource_price INTEGER)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert3 = `INSERT INTO resource_types (
-                                    name,
+                                    resource_name,
                                     resource_price)
                                     VALUES (?,?)`;
                 db.run(insert3, ["Number_of_Servers", 100]);
@@ -125,13 +125,13 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE code_languages (
-                name TEXT PRIMARY KEY)`,
+                language_name TEXT PRIMARY KEY)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert4 = `INSERT INTO code_languages (
-                                    name)
+                                    language_name)
                                     VALUES (?)`;
                 db.run(insert4, ["Java"]);
                 db.run(insert4, ["React.js"]);
@@ -143,14 +143,14 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE software_technologies (
-                name TEXT PRIMARY KEY,
+                technology_name TEXT PRIMARY KEY,
                 technology_price INTEGER)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert5 = `INSERT INTO software_technologies (
-                                    name,
+                                    technology_name,
                                     technology_price)
                                     VALUES (?, ?)`;
                 db.run(insert5, ["Docker", 100]);
@@ -163,8 +163,8 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE servers_used (
                 id INTEGER PRIMARY KEY,
-                server_name TEXT REFERENCES server_types,
-                name TEXT REFERENCES customers)`,
+                server_name REFERENCES server_types (server_name),
+                name REFERENCES customers (name))`,
         (err) => {
             if (err) {
                 // Table already created
@@ -181,8 +181,8 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE resources_used (
                 id INTEGER PRIMARY KEY,
-                name TEXT REFERENCES customers,
-                resource_name TEXT REFERENCES resource_types,
+                name REFERENCES customers (name),
+                resource_name REFERENCES resource_types (resource_name),
                 resource_amount Integer)`,
         (err) => {
             if (err) {
@@ -213,8 +213,8 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE technologies_used (
                 id INTEGER PRIMARY KEY,
-                name TEXT REFERENCES customers,
-                technology_name TEXT REFERENCES software_technologies)`,
+                name REFERENCES customers (name),
+                technology_name REFERENCES software_technologies (technology_name))`,
         (err) => {
             if (err) {
                 // Table already created
@@ -233,17 +233,17 @@ const db = new sqlite3.Database('webspace', (err) => {
 
         db.run(
             `CREATE TABLE applications (
-                name TEXT PRIMARY KEY,
+                application_name TEXT PRIMARY KEY,
                 version_num TEXT,
                 application_url TEXT,
                 application_port TEXT,
-                name TEXT REFERENCES customers)`,
+                name REFERENCES customers (name))`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert9 = `INSERT INTO applications (
-                                    name,
+                                    application_name,
                                     version_num,
                                     application_url,
                                     application_port,
@@ -266,22 +266,24 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE languages_used (
                 id INTEGER PRIMARY KEY,
-                application_name TEXT REFERENCES applications,
-                language_name TEXT REFERENCES code_languages)`,
+                application_name REFERENCES applications (applicatiom_name),
+                language_name REFERENCES code_languages (language_name),
+                name REFERENCES customers (name))`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert10 = `INSERT INTO languages_used (
                                     application_name,
-                                    language_name)
-                                    VALUES (?,?)`;
-                db.run(insert10, ["appa", "Node.js"]);
-                db.run(insert10, ["appa", "React.js"]);
-                db.run(insert10, ["appb", "Python"]);
-                db.run(insert10, ["appb", "Java"]);
-                db.run(insert10, ["appc", "C++"]);
-                db.run(insert10, ["appc", "C#"]);
+                                    language_name,
+                                    name)
+                                    VALUES (?,?,?)`;
+                db.run(insert10, ["appa", "Node.js", "adamapple"]);
+                db.run(insert10, ["appa", "React.js", "adamapple"]);
+                db.run(insert10, ["appb", "Python", "bobbaker"]);
+                db.run(insert10, ["appb", "Java", "bobbaker"]);
+                db.run(insert10, ["appc", "C++", "carlcake"]);
+                db.run(insert10, ["appc", "C#", "carlcake"]);
             }
         });
     }

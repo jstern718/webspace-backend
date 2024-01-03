@@ -19,26 +19,6 @@ app.get("/", (req, res, next) => {
 
 // Insert other API endpoints here
 
-// app.get("/api/:name", (req, res, next) => {
-//     console.log("-----");
-//     console.log("run route: '/api/:table'")
-//     let tableVar = req.params.table;
-//     let sql = `SELECT * FROM ${tableVar}`;
-//     let params = [];
-//     db.all(sql, params, (err, row) => {
-//         console.log("db.all runs:", "sql =", sql);
-//         if (err) {
-//           console.log("sql error at line 24");
-//           res.status(400).json({"error":err.message});
-//           return;
-//         }
-//         res.json({
-//             "message":"success",
-//             "data":row
-//         })
-//       });
-// });
-
 app.all("/api/:name/:table", (req, res, next) => {
     console.log("-----");
     console.log("run route: '/api/:name/:table'");
@@ -53,7 +33,7 @@ app.all("/api/:name/:table", (req, res, next) => {
         console.log("db.all runs:", "sql =", sql);
         console.log("params =", params);
         if (err) {
-            console.log("sql error at line 53");
+            console.log("sql error at line 32");
             res.status(400).json({"error":err.message});
             return;
         }
@@ -64,41 +44,32 @@ app.all("/api/:name/:table", (req, res, next) => {
     });
 });
 
-// app.all("/api/:table/:name", (req, res, next) => {
+// app.all("/api/:name/:table/:info", (req, res, next) => {
 //     console.log("-----");
-//     console.log("run route: '/api/:table/:name'")
+//     console.log("run route: '/api/:name/:table/:info'");
 
-//     let tableVar = req.params.table;
 //     let nameVar = req.params.name || null;
-//     let whereInsert = "name";
+//     let tableVar = req.params.table || null;
+//     let infoVar = req.params.info || null;
+//     let whereInsert = "application_name"
 
-//     // if (tableVar === "customers" ||
-//     //     tableVar === "server_types" ||
-//     //     tableVar === "resource_types" ||
-//     //     tableVar === "code_languages" ||
-//     //     tableVar === "software_technologies" ||
-//     //     tableVar === "applications"){
-//     //     whereInsert = "name";
-//     // }
-//     // else{
-//     //     whereInsert = "name";
-//     // }
-
-//     let sql = `SELECT * FROM ${tableVar} WHERE ${whereInsert} = ?`;
-//     let params = [nameVar];
+//     let sql = `SELECT * FROM ${tableVar} WHERE name = ?,
+//      ${whereInsert} = ?`;
+//     let params = [nameVar, infoVar];
 
 //     db.all(sql, params, (err, row) => {
-//         console.log("db.get runs:", "sql =", sql, "params =", params);
+//         console.log("db.all runs:", "sql =", sql);
+//         console.log("params =", params);
 //         if (err) {
-//           console.log("sql error at line 76");
-//           res.status(400).json({"error":err.message});
-//           return;
+//             console.log("sql error at line 60");
+//             res.status(400).json({"error":err.message});
+//             return;
 //         }
 //         res.json({
 //             "message":"success",
 //             "data":row
 //         })
-//       });
+//     });
 // });
 
 // Default response for any other request
