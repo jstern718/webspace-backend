@@ -19,6 +19,8 @@ app.get("/", (req, res, next) => {
 
 // API endpoints
 
+//Endpoint for 1 Param
+
 app.all("/api/:table", (req, res, next) => {
     console.log("-----");
     console.log("run route: '/api/:table'");
@@ -40,6 +42,8 @@ app.all("/api/:table", (req, res, next) => {
         })
     });
 });
+
+//Endpoint for 2 Params
 
 app.all("/api/:name/:table", (req, res, next) => {
     console.log("-----");
