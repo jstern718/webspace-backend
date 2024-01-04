@@ -88,15 +88,15 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE server_types (
-                server_name TEXT PRIMARY KEY,
-                server_price INTEGER)`,
+                name TEXT PRIMARY KEY,
+                price INTEGER)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert2 = `INSERT INTO server_types (
-                                    server_name,
-                                    server_price)
+                                    name,
+                                    price)
                                     VALUES (?, ?)`;
                 db.run(insert2, ["Apache_Tomcat", 1100]);
                 db.run(insert2, ["IIS", 1200]);
@@ -106,15 +106,15 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE resource_types (
-                resource_name TEXT PRIMARY KEY,
-                resource_price INTEGER)`,
+                name TEXT PRIMARY KEY,
+                price INTEGER)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert3 = `INSERT INTO resource_types (
-                                    resource_name,
-                                    resource_price)
+                                    name,
+                                    price)
                                     VALUES (?,?)`;
                 db.run(insert3, ["Number_of_Servers", 100]);
                 db.run(insert3, ["Memory_Usage", 50]);
@@ -143,15 +143,15 @@ const db = new sqlite3.Database('webspace', (err) => {
         });
         db.run(
             `CREATE TABLE software_technologies (
-                technology_name TEXT PRIMARY KEY,
-                technology_price INTEGER)`,
+                name TEXT PRIMARY KEY,
+                price INTEGER)`,
         (err) => {
             if (err) {
                 // Table already created
             }else{
                 let insert5 = `INSERT INTO software_technologies (
-                                    technology_name,
-                                    technology_price)
+                                    name,
+                                    price)
                                     VALUES (?, ?)`;
                 db.run(insert5, ["Docker", 100]);
                 db.run(insert5, ["Elasticsearch", 200]);
@@ -163,7 +163,7 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE servers_used (
                 id INTEGER PRIMARY KEY,
-                server_name REFERENCES server_types (server_name),
+                server_name REFERENCES server_types (name),
                 name REFERENCES customers (name))`,
         (err) => {
             if (err) {
@@ -182,7 +182,7 @@ const db = new sqlite3.Database('webspace', (err) => {
             `CREATE TABLE resources_used (
                 id INTEGER PRIMARY KEY,
                 name REFERENCES customers (name),
-                resource_name REFERENCES resource_types (resource_name),
+                resource_name REFERENCES resource_types (name),
                 resource_amount Integer)`,
         (err) => {
             if (err) {
@@ -214,7 +214,7 @@ const db = new sqlite3.Database('webspace', (err) => {
             `CREATE TABLE technologies_used (
                 id INTEGER PRIMARY KEY,
                 name REFERENCES customers (name),
-                technology_name REFERENCES software_technologies (technology_name))`,
+                technology_name REFERENCES software_technologies (name))`,
         (err) => {
             if (err) {
                 // Table already created
@@ -237,7 +237,8 @@ const db = new sqlite3.Database('webspace', (err) => {
                 version_num TEXT,
                 application_url TEXT,
                 application_port TEXT,
-                name REFERENCES customers (name))`,
+                name Text,
+                FOREIGN KEY(name) REFERENCES customers (name))`,
         (err) => {
             if (err) {
                 // Table already created
@@ -266,12 +267,12 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE languages_used (
                 id INTEGER PRIMARY KEY,
-                application_name REFERENCES applications (applicatiom_name),
+                application_name REFERENCES applications (application_name),
                 language_name REFERENCES code_languages (language_name),
                 name REFERENCES customers (name))`,
         (err) => {
             if (err) {
-                // Table already created
+            //  Table already created
             }else{
                 let insert10 = `INSERT INTO languages_used (
                                     application_name,

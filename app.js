@@ -6,7 +6,7 @@ let app = express();
 let db = require("./db.js")
 const cors = require('cors');
 
-
+//prevent cors error
 app.use(cors());
 
 // Root endpoint
@@ -17,23 +17,20 @@ app.get("/", (req, res, next) => {
     res.json({"message":"Ok"})
 });
 
-// Insert other API endpoints here
+// API endpoints
 
-app.all("/api/:name/:table", (req, res, next) => {
+app.all("/api/:table", (req, res, next) => {
     console.log("-----");
-    console.log("run route: '/api/:name/:table'");
+    console.log("run route: '/api/:table'");
 
-    let nameVar = req.params.name || null;
     let tableVar = req.params.table || null;
 
-    let sql = `SELECT * FROM ${tableVar} WHERE name = ?`;
-    let params = [nameVar];
+    let sql = `SELECT * FROM ${tableVar}`;
 
-    db.all(sql, params, (err, row) => {
+    db.all(sql, (err, row) => {
         console.log("db.all runs:", "sql =", sql);
-        console.log("params =", params);
         if (err) {
-            console.log("sql error at line 32");
+            console.log("sql error at line 30");
             res.status(400).json({"error":err.message});
             return;
         }
@@ -44,33 +41,33 @@ app.all("/api/:name/:table", (req, res, next) => {
     });
 });
 
-// app.all("/api/:name/:table/:info", (req, res, next) => {
-//     console.log("-----");
-//     console.log("run route: '/api/:name/:table/:info'");
+app.all("/api/:name/:table", (req, res, next) => {
+    console.log("-----");
+    console.log("run route: '/api/:name/:table'");
 
-//     let nameVar = req.params.name || null;
-//     let tableVar = req.params.table || null;
-//     let infoVar = req.params.info || null;
-//     let whereInsert = "application_name"
+    let nameVar = req.params.name || null;
+    let tableVar = req.params.table || null;
 
-//     let sql = `SELECT * FROM ${tableVar} WHERE name = ?,
-//      ${whereInsert} = ?`;
-//     let params = [nameVar, infoVar];
+    let sql = `SELECT *
+                FROM ${tableVar}
+                WHERE name = ?`;
+    let params = [nameVar];
 
-//     db.all(sql, params, (err, row) => {
-//         console.log("db.all runs:", "sql =", sql);
-//         console.log("params =", params);
-//         if (err) {
-//             console.log("sql error at line 60");
-//             res.status(400).json({"error":err.message});
-//             return;
-//         }
-//         res.json({
-//             "message":"success",
-//             "data":row
-//         })
-//     });
-// });
+    db.all(sql, params, (err, row) => {
+        console.log("db.all runs:", "sql =", sql);
+        console.log("params =", params);
+        if (err) {
+            console.log("sql error at line 58");
+            res.status(400).json({"error":err.message});
+            return;
+        }
+        res.json({
+            "message":"success",
+            "data":row
+        })
+    });
+});
+
 
 // Default response for any other request
 app.use(function(req, res){
