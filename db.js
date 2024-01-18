@@ -1,9 +1,9 @@
 "use strict";
 
 const sqlite3 = require("sqlite3").verbose();
+// const bcrypt = require("bcrypt");
 
 /** Function for setting up webspace database. */
-
 const db = new sqlite3.Database('webspace', (err) => {
     if (err) {
         console.error(err.message);
@@ -86,6 +86,7 @@ const db = new sqlite3.Database('webspace', (err) => {
                                 "carl@ccorp.com"]);
             }
         });
+
         db.run(
             `CREATE TABLE server_types (
                 name TEXT PRIMARY KEY,
