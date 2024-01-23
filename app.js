@@ -4,6 +4,7 @@
 let express = require("express");
 let app = express();
 let db = require("./db.js")
+
 // const auth = require("./auth");
 
 const cors = require('cors');
@@ -13,68 +14,79 @@ const jwt = require("jsonwebtoken");
 
 //prevent cors error
 app.use(cors());
+// process JSON body => req.body
+app.use(express.json());
 
+async function compare(incomingPassword, savedPassword){
+    console.log("incomingPassword", incomingPassword);
+    console.log("savedPassword", savedPassword);
+    const compared = await bcrypt.compare(incomingPassword, savedPassword);
+    console.log("compared", compared);
+    return compared;
+}
 
-async function authenticate(username, password) {
-    // try to find the user first
-    const result = await db.query(`
-        SELECT username,
-               password
-        FROM users
-        WHERE username = $1`, [username],
+ /** Register user
+  *  {username, password} => {username} */
+
+app.post("/register", async function (req, res, next) {
+
+    // if (req.body === undefined) throw new BadRequestError();
+    console.log("req.body register", req.body)
+    const { name, password } = req.body;
+    const hashedPassword = await bcrypt.hash(
+        password, 10
     );
+    const result = await db.run(
+    `INSERT INTO users (name, password)
+            VALUES
+            ($1, $2)`,
+        [name, hashedPassword]);
 
-    const user = result.rows[0];
+    const token = jwt.sign({ name }, "secret");
+    console.log("register token", token)
+    return res.json({ token });
 
-    if (user) {
-      // compare hashed password to a new hash from password
-      const isValid = await bcrypt.compare(password, user.password);
-      if (isValid === true) {
-        delete user.password;
-        return user;
-      }
-    }
+});
 
-    throw new UnauthorizedError("Invalid username/password");
-  }
+/** Login: returns JWT on success. */
+app.post("/login", async function (req, res, next) {
 
-  /** Register user with data.
-   *
-   * Returns { username, firstName, lastName, email, isAdmin }
-   *
-   * Throws BadRequestError on duplicates.
-   **/
+    // if (req.body === undefined) throw new BadRequestError();
+    console.log("req.body login", req.body);
 
-  async function register(username, password){
+    let nameVar = req.body.name || null;
+    let tableVar = "users";
+    console.log("req.body.password", req.body.password);
+    const name = req.body.name;
 
-    const duplicateCheck = await db.query(`
-        SELECT username
-        FROM users
-        WHERE username = $1`, [username],
-    );
+    let sql = `SELECT *
+                FROM ${tableVar}
+                WHERE name = ?`;
+    let params = [nameVar];
 
-    if (duplicateCheck.rows.length > 0) {
-      throw new Error(`Duplicate username: ${username}`);
-    }
+    db.all(sql, params, (err, row) => {
+        console.log("db.all runs:", "sql =", sql);
+        console.log("params =", params);
+        console.log("row[0].password - saved", row[0].password);
+        console.log("req.body.password - incoming", req.body.password);
 
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
+        const isValid = compare(req.body.password, row[0].password);
+        if (isValid){
+            res.json({
+                "message":"success",
+                "data": jwt.sign( { name }, "secret")
+            })
+        }
+        // else {
+        //     console.log("sql error in login");
+        //     res.status(400).json({"error":err.message});
+        //     return;
+        // }
 
-    const result = await db.query(`
-                INSERT INTO users
-                (username,
-                 password)
-                VALUES ($1, $2)
-                RETURNING
-                    username`, [
-          username,
-          hashedPassword
-        ],
-    );
 
-    const user = result.rows[0];
 
-    return user;
-  }
+    });
+});
 
 
 
@@ -87,41 +99,6 @@ app.get("/", (req, res, next) => {
 });
 
 // API endpoints
-
-
-//Login endpoint
-
-app.post("/token", async function (req, res, next) {
-
-    const { username, password } = req.body;
-    const user = await User.authenticate(username, password);
-    const token = createToken(user);
-    return res.json({ token });
-  });
-
-app.all("/auth", async function (req, res, next) {
-    console.log("-----");
-    console.log("run login route: '/api/auth'");
-    console.log("req", req);
-
-    // if (req.body === undefined) throw new BadRequestError();
-
-    const { password } = req.body;
-    const result = await db.query(
-          `SELECT password
-             FROM customers
-             WHERE name = $1`,
-          [username]);
-    const user = result.rows[0];
-    console.log("auth user", user);
-    if (user) {
-        if (await bcrypt.compare(password, user.password) === true) {
-            return res.json({ message: "Logged in!" });
-        }
-    }
-    throw new UnauthorizedError("Invalid user/password");
-});
-
 
 //Endpoint for 1 Param
 
@@ -176,50 +153,6 @@ app.all("/api/:name/:table", (req, res, next) => {
     });
 });
 
-app.post("/api/login", (request, response) => {
-    User.findOne({ username: request.body.username })
-    .then((user)=>{
-        bcrypt.compare(request.body.password, user.password)
-     })
-     .then((user)=>{
-            bcrypt.compare(request.body.password, user.password)
-            .then((passwordCheck) => {
-
-                if(!passwordCheck) {
-                  return response.status(400).send({
-                    message: "Passwords does not match",
-                    error,
-                  });
-                }
-                //   create JWT token
-                const token = jwt.sign(
-                    {
-                      username: user.username
-                    },
-                    "RANDOM-TOKEN",
-                    { expiresIn: "24h" }
-                  );
-                //   return success response
-                response.status(200).send({
-                    message: "Login Successful",
-                    username: user.username,
-                    token,
-                });
-            })
-            .catch((error) => {
-                response.status(400).send({
-                    message: "Password does not match",
-                    error,
-                });
-            })
-    })
-    .catch((e) => {
-        response.status(404).send({
-            message: "Email not found",
-            e,
-        });
-    });
-});
 
 
 // Default response for any other request

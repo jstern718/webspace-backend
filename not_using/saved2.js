@@ -113,3 +113,23 @@ app.post("/api/login", (request, response) => {
 app.get("/api/auth", auth, (request, response) => {
     response.json({ message: "You are authorized to access me" });
   });
+
+
+
+  db.run(
+    `CREATE TABLE users (
+        user_name TEXT PRIMARY KEY,
+        password TEXT)`,
+(err) => {
+    if (err) {
+    //  Table already created
+    }else{
+        let insert11 = `INSERT INTO users (
+                            user_name,
+                            password)
+                            VALUES (?,?)`;
+        db.run(insert11, ["adamapple", "password1"]);
+        db.run(insert11, ["bobbaker", "password2"]);
+        db.run(insert11, ["carlcake", "password3"]);
+    }
+});
