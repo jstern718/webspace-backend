@@ -1,15 +1,17 @@
 "use strict";
 
 const sqlite3 = require("sqlite3").verbose();
+// const bcrypt = require("bcrypt");
 
 /** Function for setting up webspace database. */
-
 const db = new sqlite3.Database('webspace', (err) => {
+
     if (err) {
         console.error(err.message);
         throw err;
     } else {
         console.log('Connected to the SQLite database');
+
         db.run(
             `CREATE TABLE customers (
                 name TEXT PRIMARY KEY,
@@ -86,6 +88,7 @@ const db = new sqlite3.Database('webspace', (err) => {
                                 "carl@ccorp.com"]);
             }
         });
+
         db.run(
             `CREATE TABLE server_types (
                 name TEXT PRIMARY KEY,
@@ -287,8 +290,12 @@ const db = new sqlite3.Database('webspace', (err) => {
                 db.run(insert10, ["appc", "C#", "carlcake"]);
             }
         });
-    }
-});
+        db.run(
+            `CREATE TABLE users (
+                name TEXT PRIMARY KEY,
+                password TEXT)`
+        )
+}});
 
 module.exports = db;
 
