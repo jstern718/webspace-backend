@@ -293,9 +293,25 @@ const db = new sqlite3.Database('webspace', (err) => {
         db.run(
             `CREATE TABLE users (
                 name TEXT PRIMARY KEY,
-                password TEXT)`
-        )
-}});
+                password TEXT)`,
+        (err) => {
+            if (err) {
+            //  Table already created
+            }else{
+                let insert11 = `INSERT INTO users (
+                                    name,
+                                    password)
+                                    VALUES (?,?)`;
+                db.run(insert11, ["adamapple",
+                    "$2b$10$33u9zGQCcccim5Zm9xXpyuTaT7pPuSrh22.FaTDZYZHodvd.ZEAXO"]);
+                db.run(insert11, ["bobbaker",
+                    "$2b$10$OZ2QOsQrwRWsN5NDrLKGkO/U9w2u5VB121lGpcflVgDa56DfIZNAO"]);
+                db.run(insert11, ["carlcake",
+                    "$2b$10$Es2Oi59OkyGIV7jwAKG6PuxrVxvTGkMEIfAbMRb.SZao.5OETuE2e"]);
+            }
+        });
+    }
+});
 
 module.exports = db;
 
